@@ -120,4 +120,13 @@ public class MerchantService {
         return merchantRepository.findAll(pageable)
                 .map(this::mapToResponse);
     }
+    public List<MerchantResponse> searchMerchantByBusinessName(
+            String businessName) {
+
+        return merchantRepository
+                .findByBusinessNameContainingIgnoreCase(businessName)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
 }

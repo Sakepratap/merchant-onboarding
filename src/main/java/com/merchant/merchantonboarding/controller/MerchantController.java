@@ -72,4 +72,11 @@ public class MerchantController {
                 size,
                 sortBy);
     }
+    @GetMapping("/search")
+    public List<MerchantResponse> searchMerchantByBusinessName(
+            @RequestParam String businessName) {
+
+        return merchantService
+                .searchMerchantByBusinessName(businessName);
+    }
 }

@@ -12,5 +12,6 @@ public interface MerchantRepository
         extends JpaRepository<Merchant, Long> {
     List<Merchant> findByStatus(MerchantStatus status);
     Optional<Merchant> findByEmail(String email);
+    List<Merchant> findByBusinessNameContainingIgnoreCase(String businessName);
 
 }
