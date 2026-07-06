@@ -1,7 +1,10 @@
+
 package com.merchant.merchantonboarding.entity;
 
+import com.merchant.merchantonboarding.enums.MerchantStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "merchants")
@@ -25,5 +28,21 @@ public class Merchant {
 
     private String businessType;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private MerchantStatus status;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

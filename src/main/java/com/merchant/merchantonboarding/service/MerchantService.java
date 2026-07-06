@@ -5,6 +5,7 @@ import com.merchant.merchantonboarding.dto.MerchantResponse;
 import com.merchant.merchantonboarding.entity.Merchant;
 import com.merchant.merchantonboarding.repository.MerchantRepository;
 import org.springframework.stereotype.Service;
+import com.merchant.merchantonboarding.enums.MerchantStatus;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,8 +27,9 @@ public class MerchantService {
                 .email(request.getEmail())
                 .phone(request.getPhone())
                 .businessType(request.getBusinessType())
-                .status("PENDING")
+                .status(MerchantStatus.PENDING)
                 .build();
+
 
         Merchant savedMerchant = merchantRepository.save(merchant);
 
@@ -57,7 +59,9 @@ public class MerchantService {
                 .email(merchant.getEmail())
                 .phone(merchant.getPhone())
                 .businessType(merchant.getBusinessType())
-                .status(merchant.getStatus())
+                .status(merchant.getStatus().name())
+                .createdAt(merchant.getCreatedAt())
+                .updatedAt(merchant.getUpdatedAt())
                 .build();
     }
     public MerchantResponse approveMerchant(Long id) {
@@ -65,7 +69,7 @@ public class MerchantService {
         Merchant merchant = merchantRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Merchant not found"));
 
-        merchant.setStatus("APPROVED");
+        merchant.setStatus(MerchantStatus.APPROVED);
 
         Merchant savedMerchant = merchantRepository.save(merchant);
 
@@ -77,8 +81,7 @@ public class MerchantService {
         Merchant merchant = merchantRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Merchant not found"));
 
-        merchant.setStatus("REJECTED");
-
+        merchant.setStatus(MerchantStatus.REJECTED);
         Merchant savedMerchant = merchantRepository.save(merchant);
 
         return mapToResponse(savedMerchant);
