@@ -5,6 +5,7 @@ import com.merchant.merchantonboarding.dto.MerchantResponse;
 import com.merchant.merchantonboarding.service.MerchantService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -57,5 +58,18 @@ public class MerchantController {
 
         return merchantService.getMerchantByEmail(email);
     }
+    @GetMapping("/paged")
+    public Page<MerchantResponse> getMerchantsWithPagination(
 
+            @RequestParam(defaultValue = "0") int page,
+
+            @RequestParam(defaultValue = "5") int size,
+
+            @RequestParam(defaultValue = "merchantId") String sortBy) {
+
+        return merchantService.getMerchantsWithPagination(
+                page,
+                size,
+                sortBy);
+    }
 }

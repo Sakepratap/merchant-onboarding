@@ -9,6 +9,10 @@ import com.merchant.merchantonboarding.enums.MerchantStatus;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @Service
 public class MerchantService {
@@ -102,5 +106,18 @@ public class MerchantService {
                 .orElseThrow(() -> new RuntimeException("Merchant not found"));
 
         return mapToResponse(merchant);
+    }
+    public Page<MerchantResponse> getMerchantsWithPagination(
+            int page,
+            int size,
+            String sortBy) {
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(sortBy));
+
+        return merchantRepository.findAll(pageable)
+                .map(this::mapToResponse);
     }
 }
