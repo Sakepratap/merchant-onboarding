@@ -86,4 +86,14 @@ public class MerchantService {
 
         return mapToResponse(savedMerchant);
     }
+    public List<MerchantResponse> getMerchantsByStatus(String status) {
+
+        MerchantStatus merchantStatus =
+                MerchantStatus.valueOf(status.toUpperCase());
+
+        return merchantRepository.findByStatus(merchantStatus)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
 }

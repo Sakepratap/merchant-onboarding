@@ -45,5 +45,11 @@ public class MerchantController {
     public MerchantResponse rejectMerchant(@PathVariable Long id) {
         return merchantService.rejectMerchant(id);
     }
+    @GetMapping("/status/{status}")
+    public List<MerchantResponse> getMerchantsByStatus(
+            @PathVariable String status) {
+
+        return merchantService.getMerchantsByStatus(status);
+    }
 
 }
