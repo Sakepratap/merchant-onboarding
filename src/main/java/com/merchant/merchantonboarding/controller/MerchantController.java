@@ -51,5 +51,11 @@ public class MerchantController {
 
         return merchantService.getMerchantsByStatus(status);
     }
+    @GetMapping("/email/{email}")
+    public MerchantResponse getMerchantByEmail(
+            @PathVariable String email) {
+
+        return merchantService.getMerchantByEmail(email);
+    }
 
 }

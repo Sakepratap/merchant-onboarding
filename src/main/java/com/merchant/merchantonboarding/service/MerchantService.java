@@ -96,4 +96,11 @@ public class MerchantService {
                 .map(this::mapToResponse)
                 .toList();
     }
+    public MerchantResponse getMerchantByEmail(String email) {
+
+        Merchant merchant = merchantRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Merchant not found"));
+
+        return mapToResponse(merchant);
+    }
 }
