@@ -6,6 +6,8 @@ import com.merchant.merchantonboarding.entity.Merchant;
 import com.merchant.merchantonboarding.repository.MerchantRepository;
 import org.springframework.stereotype.Service;
 import com.merchant.merchantonboarding.enums.MerchantStatus;
+import com.merchant.merchantonboarding.kafka.MerchantProducer;
+import com.merchant.merchantonboarding.kafka.MerchantCreatedEvent;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,9 +20,12 @@ import org.springframework.data.domain.Sort;
 public class MerchantService {
 
     private final MerchantRepository merchantRepository;
+    private final MerchantProducer merchantProducer;
 
-    public MerchantService(MerchantRepository merchantRepository) {
+    public MerchantService(MerchantRepository merchantRepository,
+                           MerchantProducer merchantProducer) {
         this.merchantRepository = merchantRepository;
+        this.merchantProducer = merchantProducer;
     }
 
     public MerchantResponse createMerchant(MerchantRequest request) {
@@ -36,6 +41,15 @@ public class MerchantService {
 
 
         Merchant savedMerchant = merchantRepository.save(merchant);
+        MerchantCreatedEvent event =
+                MerchantCreatedEvent.builder()
+                        .merchantId(savedMerchant.getMerchantId())
+                        .businessName(savedMerchant.getBusinessName())
+                        .email(savedMerchant.getEmail())
+                        .status(savedMerchant.getStatus().name())
+                        .build();
+
+        merchantProducer.publishMerchantCreatedEvent(event);
 
         return mapToResponse(savedMerchant);
     }
