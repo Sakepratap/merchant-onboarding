@@ -22,4 +22,15 @@ public class MerchantProducer {
         System.out.println(
                 "Merchant Event Published : " + event);
     }
+    public void publishMerchantApprovedEvent(
+            MerchantApprovedEvent event) {
+
+        kafkaTemplate.send(
+                "merchant-approved-topic",
+                event);
+
+        System.out.println(
+                "Merchant Approved Event Published : "
+                        + event);
+    }
 }

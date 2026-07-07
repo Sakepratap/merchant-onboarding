@@ -8,12 +8,22 @@ public class MerchantConsumer {
 
     @KafkaListener(
             topics = "merchant-created-topic",
-            groupId = "merchant-group")
+            groupId = "merchant-created-group")
     public void consume(
             MerchantCreatedEvent event) {
 
         System.out.println(
                 "Merchant Event Consumed : "
+                        + event);
+    }
+    @KafkaListener(
+            topics = "merchant-approved-topic",
+            groupId = "merchant-approved-group")
+    public void consumeApproved(
+            MerchantApprovedEvent event) {
+
+        System.out.println(
+                "Merchant Approved Event Consumed : "
                         + event);
     }
 }

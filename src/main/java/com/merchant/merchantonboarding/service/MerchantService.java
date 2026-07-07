@@ -1,4 +1,6 @@
 package com.merchant.merchantonboarding.service;
+import com.merchant.merchantonboarding.kafka.MerchantApprovedEvent;
+import com.merchant.merchantonboarding.kafka.MerchantProducer;
 
 import com.merchant.merchantonboarding.dto.MerchantRequest;
 import com.merchant.merchantonboarding.dto.MerchantResponse;
@@ -8,6 +10,8 @@ import org.springframework.stereotype.Service;
 import com.merchant.merchantonboarding.enums.MerchantStatus;
 import com.merchant.merchantonboarding.kafka.MerchantProducer;
 import com.merchant.merchantonboarding.kafka.MerchantCreatedEvent;
+import com.merchant.merchantonboarding.dto.DashboardResponse;
+import com.merchant.merchantonboarding.enums.MerchantStatus;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -90,8 +94,18 @@ public class MerchantService {
         merchant.setStatus(MerchantStatus.APPROVED);
 
         Merchant savedMerchant = merchantRepository.save(merchant);
+        MerchantApprovedEvent event =
+                MerchantApprovedEvent.builder()
+                        .merchantId(savedMerchant.getMerchantId())
+                        .businessName(savedMerchant.getBusinessName())
+                        .status(savedMerchant.getStatus().name())
+                        .build();
+
+        merchantProducer.publishMerchantApprovedEvent(event);
 
         return mapToResponse(savedMerchant);
+
+
     }
 
     public MerchantResponse rejectMerchant(Long id) {
@@ -142,5 +156,53 @@ public class MerchantService {
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
+    }
+    public MerchantResponse updateMerchant(Long id, MerchantRequest request) {
+
+        Merchant merchant = merchantRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Merchant not found"));
+
+        merchant.setBusinessName(request.getBusinessName());
+        merchant.setOwnerName(request.getOwnerName());
+        merchant.setEmail(request.getEmail());
+        merchant.setPhone(request.getPhone());
+        merchant.setBusinessType(request.getBusinessType());
+
+        Merchant updatedMerchant = merchantRepository.save(merchant);
+
+        return mapToResponse(updatedMerchant);
+    }
+    public String deleteMerchant(Long id) {
+
+        Merchant merchant = merchantRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Merchant not found"));
+
+        merchantRepository.delete(merchant);
+
+        return "Merchant deleted successfully";
+    }
+    public DashboardResponse getDashboard() {
+
+        long total =
+                merchantRepository.count();
+
+        long pending =
+                merchantRepository.countByStatus(
+                        MerchantStatus.PENDING);
+
+        long approved =
+                merchantRepository.countByStatus(
+                        MerchantStatus.APPROVED);
+
+        long rejected =
+                merchantRepository.countByStatus(
+                        MerchantStatus.REJECTED);
+
+        return DashboardResponse.builder()
+                .totalMerchants(total)
+                .pendingMerchants(pending)
+                .approvedMerchants(approved)
+                .rejectedMerchants(rejected)
+                .build();
     }
 }

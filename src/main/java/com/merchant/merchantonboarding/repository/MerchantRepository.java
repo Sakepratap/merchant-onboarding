@@ -13,5 +13,6 @@ public interface MerchantRepository
     List<Merchant> findByStatus(MerchantStatus status);
     Optional<Merchant> findByEmail(String email);
     List<Merchant> findByBusinessNameContainingIgnoreCase(String businessName);
+    long countByStatus(MerchantStatus status);
 
 }

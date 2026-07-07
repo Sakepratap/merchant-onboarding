@@ -6,6 +6,7 @@ import com.merchant.merchantonboarding.service.MerchantService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
+import com.merchant.merchantonboarding.dto.DashboardResponse;
 
 import java.util.List;
 
@@ -78,5 +79,22 @@ public class MerchantController {
 
         return merchantService
                 .searchMerchantByBusinessName(businessName);
+    }
+    @PutMapping("/{id}")
+    public MerchantResponse updateMerchant(
+            @PathVariable Long id,
+            @RequestBody MerchantRequest request) {
+
+        return merchantService.updateMerchant(id, request);
+    }
+    @DeleteMapping("/{id}")
+    public String deleteMerchant(@PathVariable Long id) {
+
+        return merchantService.deleteMerchant(id);
+    }
+    @GetMapping("/dashboard")
+    public DashboardResponse getDashboard() {
+
+        return merchantService.getDashboard();
     }
 }
