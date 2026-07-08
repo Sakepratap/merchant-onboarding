@@ -1,12 +1,16 @@
 package com.merchant.merchantonboarding.controller;
 
+import com.merchant.merchantonboarding.dto.DocumentResponse;
 import com.merchant.merchantonboarding.dto.MerchantRequest;
 import com.merchant.merchantonboarding.dto.MerchantResponse;
+import com.merchant.merchantonboarding.fallback.DocumentFallbackService;
+import com.merchant.merchantonboarding.feign.DocumentServiceClient;
 import com.merchant.merchantonboarding.service.MerchantService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 import com.merchant.merchantonboarding.dto.DashboardResponse;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
 import java.util.List;
 
@@ -15,9 +19,13 @@ import java.util.List;
 public class MerchantController {
 
     private final MerchantService merchantService;
+    private final DocumentServiceClient documentClient;
 
-    public MerchantController(MerchantService merchantService) {
+    private final DocumentFallbackService fallbackService;
+    public MerchantController(MerchantService merchantService,DocumentServiceClient documentClient,DocumentFallbackService fallbackService) {
         this.merchantService = merchantService;
+        this.documentClient = documentClient;
+        this.fallbackService = fallbackService;
     }
 
 
@@ -97,4 +105,24 @@ public class MerchantController {
 
         return merchantService.getDashboard();
     }
+    @GetMapping("/{merchantId}/documents")
+    @CircuitBreaker(
+            name = "documentService",
+            fallbackMethod = "documentsFallback")
+    public List<DocumentResponse> getMerchantDocuments(
+            @PathVariable Long merchantId) {
+
+        return documentClient.getDocuments(
+                merchantId);
+    }
+    public List<DocumentResponse> documentsFallback(
+            Long merchantId,
+            Exception ex) {
+
+        System.out.println(
+                "Fallback Method Called");
+
+        return List.of();
+    }
+
 }
