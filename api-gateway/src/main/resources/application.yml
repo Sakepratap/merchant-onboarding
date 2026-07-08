@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: merchant-onboarding
+              uri: http://localhost:8081
+              predicates:
+                - Path=/merchant/**
+              filters:
+                - StripPrefix=1
+
+
+server:
+  port: 8090
