@@ -1,4 +1,10 @@
-# Merchant Onboarding Microservice
+Merchant Onboarding Microservices Platform
+
+Services:
+- Merchant Service
+- Document Service
+- Notification Service
+- API Gateway
 
 ## Tech Stack
 - Java 17
