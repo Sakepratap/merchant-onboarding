@@ -2,8 +2,8 @@ FROM eclipse-temurin:17-jdk
 
 WORKDIR /app
 
-COPY target/onboarding-0.0.1-SNAPSHOT.jar app.jar
+COPY target/*.jar merchant-service.jar
 
 EXPOSE 8081
 
-ENTRYPOINT ["java","-jar","app.jar"]
+ENTRYPOINT ["java","-jar","merchant-service.jar"]

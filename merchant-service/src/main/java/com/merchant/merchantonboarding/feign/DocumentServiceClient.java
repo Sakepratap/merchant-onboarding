@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.util.List;
 
 @FeignClient(
-        name = "document-service",
+        name = "DOCUMENT-SERVICE",
         url = "http://localhost:8084"
 )
 public interface DocumentServiceClient {

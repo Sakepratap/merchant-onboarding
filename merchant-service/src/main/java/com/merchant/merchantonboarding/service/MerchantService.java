@@ -6,12 +6,20 @@ import com.merchant.merchantonboarding.dto.MerchantRequest;
 import com.merchant.merchantonboarding.dto.MerchantResponse;
 import com.merchant.merchantonboarding.entity.Merchant;
 import com.merchant.merchantonboarding.repository.MerchantRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import com.merchant.merchantonboarding.enums.MerchantStatus;
 import com.merchant.merchantonboarding.kafka.MerchantProducer;
 import com.merchant.merchantonboarding.kafka.MerchantCreatedEvent;
 import com.merchant.merchantonboarding.dto.DashboardResponse;
 import com.merchant.merchantonboarding.enums.MerchantStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,6 +30,8 @@ import org.springframework.data.domain.Sort;
 
 @Service
 public class MerchantService {
+    private static final Logger log =
+            LoggerFactory.getLogger(MerchantService.class);
 
     private final MerchantRepository merchantRepository;
     private final MerchantProducer merchantProducer;
@@ -55,6 +65,7 @@ public class MerchantService {
 
         merchantProducer.publishMerchantCreatedEvent(event);
 
+        log.info("Normal business flow");
         return mapToResponse(savedMerchant);
     }
 
@@ -64,9 +75,11 @@ public class MerchantService {
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
-
+    @Cacheable(
+            value = "merchant",
+            key = "#id")
     public MerchantResponse getMerchantById(Long id) {
-
+        System.out.println("Fetching From Database");
         Merchant merchant = merchantRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Merchant not found"));
 
@@ -157,7 +170,12 @@ public class MerchantService {
                 .map(this::mapToResponse)
                 .toList();
     }
-    public MerchantResponse updateMerchant(Long id, MerchantRequest request) {
+    @CachePut(
+            value = "merchant",
+            key = "#id")
+    public MerchantResponse updateMerchant(
+            Long id,
+            MerchantRequest request) {
 
         Merchant merchant = merchantRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Merchant not found"));
@@ -168,10 +186,14 @@ public class MerchantService {
         merchant.setPhone(request.getPhone());
         merchant.setBusinessType(request.getBusinessType());
 
-        Merchant updatedMerchant = merchantRepository.save(merchant);
+        Merchant updatedMerchant =
+                merchantRepository.save(merchant);
 
         return mapToResponse(updatedMerchant);
     }
+    @CacheEvict(
+            value = "merchant",
+            key = "#id")
     public String deleteMerchant(Long id) {
 
         Merchant merchant = merchantRepository.findById(id)
@@ -181,6 +203,7 @@ public class MerchantService {
 
         return "Merchant deleted successfully";
     }
+
     public DashboardResponse getDashboard() {
 
         long total =
@@ -205,4 +228,5 @@ public class MerchantService {
                 .rejectedMerchants(rejected)
                 .build();
     }
+
 }

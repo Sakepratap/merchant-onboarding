@@ -1,4 +1,4 @@
-package com.merchant.notificationservice;
+package com.merchant.notificationservice.kafka;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

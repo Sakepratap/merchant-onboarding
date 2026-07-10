@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.http.MediaType;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 
@@ -41,7 +42,16 @@ public class DocumentController {
     }
     @GetMapping("/{merchantId}")
     public List<Document> getDocuments(
-            @PathVariable Long merchantId) {
+            @PathVariable Long merchantId,
+            HttpServletRequest request) {
+
+        System.out.println(
+                "TRACEPARENT = "
+                        + request.getHeader("traceparent"));
+
+        System.out.println(
+                "B3 = "
+                        + request.getHeader("b3"));
 
         return service.getDocumentsByMerchantId(
                 merchantId);
